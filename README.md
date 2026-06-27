@@ -1,6 +1,6 @@
 # GC Content Analyzer
 
-Aplikasi bioinformatika berbasis web yang dirancang menggunakan Python dan Flask untuk menganalisis distribusi konten GC (*Guanine-Cytosine*) di dalam sekuens DNA dalam format FASTA maupun FASTQ.
+Aplikasi bioinformatika berbasis web yang dirancang menggunakan Python dan Flask untuk menganalisis distribusi konten GC (*Guanine-Cytosine*) di dalam sekuens nukleotida dengan format FASTA maupun FASTQ.
 
 ---
 
