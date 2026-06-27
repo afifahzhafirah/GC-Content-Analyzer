@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 GC Content Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+
+    <style>
+        body {
+            background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85)), url("/static/dna_bg.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body>
+    <input type="checkbox" id="trigger-upload" class="state-toggle" {% if results or error %}checked{% endif %}>
+
+    <div class="app-container {% if results %}results-active{% endif %}">
+        
+        <header class="hero-section">
+            <h1 class="main-title">🧬 GC Content Analyzer</h1>
+            {% if not results and not error %}
+            <label for="trigger-upload" class="btn-get-started">Get Started →</label>
+            {% endif %}
+        </header>
+
+        <section class="upload-card animation-target">
+            <form action="/analyze" method="POST" enctype="multipart/form-data">
+                <div class="dropzone">
+                    <span class="upload-icon">📂</span>
+                    <label class="custom-file-upload">
+                        Browse New File
+                        <input type="file" name="sequence_file" accept=".fasta,.fastq,.txt,.fq" onchange="form.submit()">
+                    </label>
+                    <p class="help-text">Upload another sequence file to overwrite results</p>
+                </div>
+            </form>
+        </section>
+
+        {% if error %}
+        <div class="error-card">⚠️ {{ error }}</div>
+        {% endif %}
+
+        {% if results %}
+        <main class="dashboard-fade-in">
+            <div class="file-status-bar">
+                <span class="status-pulse"></span>
+                <span class="status-text">Active Dataset: <strong>{{ filename if filename else "sample.fasta" }}</strong></span>
+            </div>
+
+            <div class="summary-banner">✨ {{ summary }}</div>
+
+            <h2 class="section-title">🏆 Top 3 Highest GC Profiles</h2>
+            <div class="top-cards-grid">
+                {% for item in top_three %}
+                <div class="metric-card">
+                    <h3>Rank {{ loop.index }}: {{ item['Variant'] }}</h3>
+                    <div class="metric-value">{{ item['GC Content (%)'] }}%</div>
+                    <p style="color: #94a3b8; font-size: 0.8rem;">Length: {{ item['Length (bp)'] }} bp</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h2 class="section-title">📊 Visual Analytics Chart</h2>
+            <div class="chart-wrapper">
+                <img src="{{ chart_url }}" alt="GC Content Chart">
+            </div>
+            
+            <div class="divider"></div>
+
+            <div class="data-section">
+                <div class="table-header">
+                    <h2 class="section-title">📊 Complete Nucleotide Matrix</h2>
+                    <a class="btn-download" href="/download-csv">📥 Export CSV</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Sequence Identifier</th>
+                                <th>Length (bp)</th>
+                                <th>A</th>
+                                <th>T</th>
+                                <th>G</th>
+                                <th>C</th>
+                                <th>GC Content</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in results %}
+                            <tr>
+                                <td style="font-weight: 600;">{{ item['Variant'] }}</td>
+                                <td>{{ item['Length (bp)'] }}</td>
+                                <td>{{ item['A'] }}</td>
+                                <td>{{ item['T'] }}</td>
+                                <td>{{ item['G'] }}</td>
+                                <td>{{ item['C'] }}</td>
+                                <td style="font-weight: bold; color: #f43f5e;">{{ item['GC Content (%)'] }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        {% endif %}
+    </div>
+</body>
+</html>
